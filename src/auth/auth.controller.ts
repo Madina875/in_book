@@ -1,11 +1,19 @@
-import { Body, Controller, Get, Post, Req, Res } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Req,
+  Res,
+} from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { CreateUserDto } from "../users/dto/create-user.dto";
 import { SignInuserDto } from "../users/dto/signin-user.dto";
 import { Request, Response } from "express";
 import { CreateAdminDto } from "../admin/dto/create-admin.dto";
 import { SignInadminDto } from "../admin/dto/signin-admin.dto";
-import { PassThrough } from "stream";
 
 @Controller("auth")
 export class AuthController {
@@ -72,5 +80,10 @@ export class AuthController {
     } catch (error) {
       return res.status(error.status || 401).json({ message: error.message });
     }
+  }
+
+  @Get("users/activate/:activation_link")
+  async activateUser(@Param("activation_link") activationLink: string) {
+    return this.authService.activateUser(activationLink);
   }
 }

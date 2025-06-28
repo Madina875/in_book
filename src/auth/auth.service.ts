@@ -20,6 +20,7 @@ import { Admin } from "../admin/entities/admin.entity";
 import { CreateAdminDto } from "../admin/dto/create-admin.dto";
 import { SignInadminDto } from "../admin/dto/signin-admin.dto";
 import { ValidationError } from "sequelize";
+import { InjectModel } from "@nestjs/sequelize";
 
 // npm install jsonwebtoken
 // npm install --save-dev @types/jsonwebtoken
@@ -30,7 +31,9 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
     private readonly adminService: AdminService,
-    private readonly mailService: MailService
+    private readonly mailService: MailService,
+    @InjectModel(Admin) private readonly adminModel: typeof Admin,
+    @InjectModel(User) private readonly userModel: typeof User
   ) {}
 
   async generateTokens(user: User) {
@@ -119,8 +122,7 @@ export class AuthService {
     }
     //
     return {
-      message:
-        "Ro'yhatdan o'tdingiz. Akkauntni faollashtirish uchun email ni tasdiqlang!",
+      message: `Ro'yhatdan o'tdingiz. Akkauntni faollashtirish uchun email ni tasdiqlang}`,
     };
     return newUser;
   }
@@ -167,7 +169,7 @@ export class AuthService {
         refresh_token,
         process.env.REFRESH_TOKEN_KEY!
       );
-      const user = await User.findOne({ where: { id: decoded.id } });
+      const user = await this.userModel.findOne({ where: { id: decoded.id } });
 
       if (!user || !user.refresh_token) {
         console.log("User or their refresh_token is null");
@@ -238,7 +240,9 @@ export class AuthService {
         refresh_token,
         process.env.REFRESH_TOKEN_KEY!
       );
-      const admin = await Admin.findOne({ where: { id: decoded.id } });
+      const admin = await this.adminModel.findOne({
+        where: { id: decoded.id },
+      });
 
       if (!admin || !admin.refresh_token) {
         console.log("Admin or their refresh_token is null");
@@ -277,7 +281,7 @@ export class AuthService {
       throw new UnauthorizedException("Invalid or expired refresh token");
     }
 
-    const user = await User.findOne({ where: { id: decoded.id } });
+    const user = await this.userModel.findOne({ where: { id: decoded.id } });
 
     if (!user || !user.refresh_token) {
       throw new UnauthorizedException("User not found or token missing");
@@ -323,7 +327,7 @@ export class AuthService {
       throw new UnauthorizedException("Invalid or expired refresh token");
     }
 
-    const admin = await Admin.findOne({ where: { id: decoded.id } });
+    const admin = await this.adminModel.findOne({ where: { id: decoded.id } });
 
     if (!admin || !admin.refresh_token) {
       throw new UnauthorizedException("User not found or token missing");
@@ -357,30 +361,26 @@ export class AuthService {
     return { access_token: newAccessToken };
   }
 
-  // activateUser = async (req: Request, res: Response) => {
-  //   try {
-  //     const { link } = req.params;
+  async activateUser(activationLink: string) {
+    if (!activationLink) {
+      throw new UnauthorizedException("Activation link is required");
+    }
 
-  //     if (!link) {
-  //       throw new UnauthorizedException("Activation link is required");
-  //     }
+    const admin = await this.userModel.findOne({
+      where: { activation_link: activationLink },
+    });
 
-  //     const admin = await Admin.findOne({ where: {} });
+    if (!admin) {
+      throw new NotFoundException("Invalid activation link");
+    }
 
-  //     if (!admin) {
-  //       throw new NotFoundException("Invalid activation link");
-  //     }
+    if (admin.is_active) {
+      throw new ConflictException("Admin account is already activated");
+    }
 
-  //     if (admin.is_active) {
-  //       throw new ConflictException("Admin account is already activated");
-  //     }
+    admin.is_active = true;
+    await admin.save();
 
-  //     admin.is_active = true;
-  //     await admin.save();
-
-  //     return { message: "user account activated successfully" };
-  //   } catch (error) {
-  //     throw new BadRequestException("error in code");
-  //   }
-  // };
+    return { message: "User account activated successfully" };
+  }
 }

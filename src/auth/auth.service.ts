@@ -94,12 +94,12 @@ export class AuthService {
 
     const newAdmin = await this.adminService.create(createAdminDto);
     //sendMail
-    // try {
-    //   await this.mailService.sendMail(newAdmin);
-    // } catch (error) {
-    //   console.log(error);
-    //   throw new ServiceUnavailableException("email da xatolik");
-    // }
+    try {
+      await this.mailService.sendAdminConfirmation(newAdmin);
+    } catch (error) {
+      console.log(error);
+      throw new ServiceUnavailableException("email da xatolik");
+    }
     return newAdmin;
   }
 
@@ -113,7 +113,6 @@ export class AuthService {
 
     const newUser = await this.usersService.create(createuserDto);
     //sendMail
-
     try {
       await this.mailService.sendMail(newUser);
     } catch (error) {
@@ -366,7 +365,30 @@ export class AuthService {
       throw new UnauthorizedException("Activation link is required");
     }
 
-    const admin = await this.userModel.findOne({
+    const user = await this.userModel.findOne({
+      where: { activation_link: activationLink },
+    });
+
+    if (!user) {
+      throw new NotFoundException("Invalid activation link");
+    }
+
+    if (user.is_active) {
+      throw new ConflictException("User account is already activated");
+    }
+
+    user.is_active = true;
+    await user.save();
+
+    return { message: "User account activated successfully" };
+  }
+
+  async activateAdmin(activationLink: string) {
+    if (!activationLink) {
+      throw new UnauthorizedException("Activation link is required");
+    }
+
+    const admin = await this.adminModel.findOne({
       where: { activation_link: activationLink },
     });
 
@@ -381,6 +403,6 @@ export class AuthService {
     admin.is_active = true;
     await admin.save();
 
-    return { message: "User account activated successfully" };
+    return { message: "Admin account activated successfully" };
   }
 }

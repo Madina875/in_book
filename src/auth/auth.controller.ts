@@ -86,4 +86,9 @@ export class AuthController {
   async activateUser(@Param("activation_link") activationLink: string) {
     return this.authService.activateUser(activationLink);
   }
+
+  @Get("admin/activate/:activation_link")
+  async activateAdmin(@Param("activation_link") activationLink: string) {
+    return this.authService.activateAdmin(activationLink);
+  }
 }

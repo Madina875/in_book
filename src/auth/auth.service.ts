@@ -19,7 +19,6 @@ import { AdminService } from "../admin/admin.service";
 import { Admin } from "../admin/entities/admin.entity";
 import { CreateAdminDto } from "../admin/dto/create-admin.dto";
 import { SignInadminDto } from "../admin/dto/signin-admin.dto";
-import { ValidationError } from "sequelize";
 import { InjectModel } from "@nestjs/sequelize";
 
 // npm install jsonwebtoken
@@ -177,6 +176,7 @@ export class AuthService {
       // console.log("Raw token from cookie:", refresh_token);
       // console.log("Hashed token in DB:", user.refresh_token);
 
+      
       const isMatch = await bcrypt.compare(refresh_token, user.refresh_token);
       if (!isMatch) {
         throw new UnauthorizedException("Invalid token");
@@ -190,9 +190,20 @@ export class AuthService {
       return { message: "Logged out successfully" };
     } catch (error) {
       console.error("Signout error:", error);
-      throw new UnauthorizedException("Error occurred during logout");
+      throw new UnauthorizedException("Error occurred during logout", error);
     }
   }
+
+  // async signOut2(refreshToken: string, res: Response) {
+  //   const userData = await this.jwtService.verify(refreshToken, {
+  //     secret: process.env.REFRESH_TOKEN_KEY,
+  //   });
+  //   await this.usersService.updateRefreshToken(userData.id, "");
+  //   res.clearCookie("refreshToken");
+  //   return {
+  //     message: "User logged out successfully",
+  //   };
+  // }
 
   async signinAdmin(signInAdminDto: SignInadminDto, res: Response) {
     const admin = await this.adminService.findAdminByEmail(
@@ -267,9 +278,8 @@ export class AuthService {
     }
   }
 
-  async refreshUserToken(req: Request, res: Response) {
+  async refreshUserToken(id: number, req: Request, res: Response) {
     const refresh_token = req.cookies?.refresh_token;
-
     if (!refresh_token) {
       throw new BadRequestException("Refresh token is required");
     }
@@ -279,8 +289,15 @@ export class AuthService {
     } catch (err) {
       throw new UnauthorizedException("Invalid or expired refresh token");
     }
-
+    // console.log(decoded);
+    // console.log(id);
     const user = await this.userModel.findOne({ where: { id: decoded.id } });
+
+    if (decoded.id !== id) {
+      throw new UnauthorizedException(
+        "user's id and id in parameter not match"
+      );
+    }
 
     if (!user || !user.refresh_token) {
       throw new UnauthorizedException("User not found or token missing");
@@ -310,9 +327,9 @@ export class AuthService {
       sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
-
-    return { access_token: newAccessToken };
+    return { message: "user refreshed", id: id, access_token: newAccessToken };
   }
+
   async refreshAdminToken(req: Request, res: Response) {
     const refresh_token = req.cookies?.refresh_token;
 

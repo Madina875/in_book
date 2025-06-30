@@ -42,6 +42,15 @@ export class UsersService {
     });
     return user[1][0];
   }
+  // async updateRefreshToken(id: number, refresh_token: string) {
+  //   const user = await this.userModel.update(
+  //     { refresh_token },
+  //     {
+  //       where: { id },
+  //     }
+  //   );
+  //   return user;
+  // }
 
   async remove(id: number) {
     const user = await this.userModel.destroy({ where: { id } });

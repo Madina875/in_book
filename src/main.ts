@@ -21,7 +21,7 @@ async function start() {
       )
       .addBearerAuth()
       .build();
-    const documentFactory = () => SwaggerModule.createDocument(app, config);
+    const documentFactory = () => SwaggerModule.createDocument(app, config); // what helps ? question for this part "createdocumetn()"
     SwaggerModule.setup("api/docs", app, documentFactory);
 
     await app.listen(PORT, () => {
@@ -41,5 +41,16 @@ nest g res auth --no-spec
 npm i bcrypt
 npm i -D @types/bcrypt
 npm install --save @nestjs/jwt
+
+*/
+
+
+/*
+
+
+In NestJS, the method SwaggerModule.createDocument(app, config)
+is used to generate an OpenAPI (Swagger) document that describes 
+your API endpoints, models, parameters, etc.
+
 
 */

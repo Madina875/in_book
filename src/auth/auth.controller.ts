@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   Param,
   Patch,
   Post,
@@ -14,6 +15,7 @@ import { SignInuserDto } from "../users/dto/signin-user.dto";
 import { Request, Response } from "express";
 import { CreateAdminDto } from "../admin/dto/create-admin.dto";
 import { SignInadminDto } from "../admin/dto/signin-admin.dto";
+import { CookieGetter } from "../common/decorators/cookie-getter.decorator";
 
 @Controller("auth")
 export class AuthController {
@@ -46,6 +48,15 @@ export class AuthController {
     }
   }
 
+  // @HttpCode(200)
+  // @Post("signout2")
+  // async signOut2(
+  //   @CookieGetter("refresh_oken") refreshToken: string,
+  //   @Res({ passthrough: true }) res: Response
+  // ) {
+  //   return this.authService.signout(refreshToken, res);
+  // }
+
   @Post("signin_admin")
   signinAdmin(
     @Body() signInAdminDto: SignInadminDto,
@@ -63,15 +74,21 @@ export class AuthController {
       return res.status(error.status || 401).json({ message: error.message });
     }
   }
-  @Post("refresh_user")
-  async refreshUserToken(@Req() req: Request, @Res() res: Response) {
+  @Post(":id/refresh_user")
+  async refreshUserToken(
+    @Param("id") id: number,
+    @Req()
+    req: Request,
+    @Res() res: Response
+  ) {
     try {
-      const result = await this.authService.refreshUserToken(req, res);
+      const result = await this.authService.refreshUserToken(+id, req, res);
       return res.json(result);
     } catch (error) {
       return res.status(error.status || 401).json({ message: error.message });
     }
   }
+
   @Post("refresh_admin")
   async refreshAdminToken(@Req() req: Request, @Res() res: Response) {
     try {

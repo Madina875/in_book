@@ -19,17 +19,19 @@ import { JwtAdminCreatorGuard } from "../common/guards/jwt-creator-admin.guard";
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
+  @UseGuards(JwtAdminCreatorGuard)
+  @UseGuards(JwtAdminAuthGuard)
   @Post()
   create(@Body() createAdminDto: CreateAdminDto) {
     return this.adminService.create(createAdminDto);
   }
 
+  @UseGuards(JwtAdminAuthGuard)
   @Get()
   findAll() {
     return this.adminService.findAll();
   }
 
-  @UseGuards(JwtAdminCreatorGuard)
   @UseGuards(JwtAdminSelfGuard)
   @UseGuards(JwtAdminAuthGuard)
   @Get(":id")
@@ -37,11 +39,15 @@ export class AdminController {
     return this.adminService.findOne(+id);
   }
 
+  @UseGuards(JwtAdminSelfGuard)
+  @UseGuards(JwtAdminAuthGuard)
   @Patch(":id")
   update(@Param("id") id: string, @Body() updateAdminDto: UpdateAdminDto) {
     return this.adminService.update(+id, updateAdminDto);
   }
 
+  @UseGuards(JwtAdminSelfGuard)
+  @UseGuards(JwtAdminAuthGuard)
   @Delete(":id")
   remove(@Param("id") id: string) {
     return this.adminService.remove(+id);

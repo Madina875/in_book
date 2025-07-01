@@ -22,11 +22,19 @@ export class LanguageService {
     return this.languageModel.findByPk(id);
   }
 
-  update(id: number, updateLanguageDto: UpdateLanguageDto) {
-    return `This action updates a #${id} language`;
+  async update(id: number, updateLanguageDto: UpdateLanguageDto) {
+    const lang = await this.languageModel.update(updateLanguageDto, {
+      where: { id },
+      returning: true,
+    });
+    return lang[1][0];
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} language`;
+  async remove(id: number) {
+    const r = await this.languageModel.destroy({ where: { id } });
+    if (r > 0) {
+      return { message: "deleted successfully" };
+    }
+    return { message: "language not found" };
   }
 }

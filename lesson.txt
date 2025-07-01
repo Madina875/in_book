@@ -1,0 +1,16 @@
+npm i nestjs-telegraf telegraf  /1
+
+nest g res bot  /2
+
+app.module:     include: [BotModule], //bot 3
+
+app.constants : export const BOT_NAME = "InBook";
+
+
+bot.module:  //4
+@Module({
+  controllers: [],
+  providers: [BotService, BotUpdate],  //bot
+})
+export class BotModule {}
+

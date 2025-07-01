@@ -22,11 +22,19 @@ export class CategoryService {
     return this.categoryModel.findByPk(id);
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
+  async update(id: number, updateCategoryDto: UpdateCategoryDto) {
+    const category = await this.categoryModel.update(updateCategoryDto, {
+      where: { id },
+      returning: true,
+    });
+    return category[1][0];
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+  async remove(id: number) {
+    const r = await this.categoryModel.destroy({ where: { id } });
+    if (r > 0) {
+      return { message: "category deleted successfully" };
+    }
+    return { message: "category not found" };
   }
 }

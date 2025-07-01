@@ -17,9 +17,29 @@ import { Author } from "./author/entities/author.entity";
 import { Category } from "./category/entities/category.entity";
 import { Genre } from "./genre/entities/genre.entity";
 import { Language } from "./language/entities/language.entity";
+import { TelegrafModule } from "nestjs-telegraf";
+import { BOT_NAME } from "./app.constants";
+import { BotModule } from "./bot/bot.module";
+import { BooksModule } from "./books/books.module";
+import { Book } from "./books/entities/book.entity";
+import { BookVersionModule } from "./book_version/book_version.module";
+import { BookVersion } from "./book_version/entities/book_version.entity";
+import { AudioBookModule } from "./audio_book/audio_book.module";
+import { AudioBook } from "./audio_book/entities/audio_book.entity";
+import { AudioPartsModule } from "./audio_parts/audio_parts.module";
+import { AudioPart } from "./audio_parts/entities/audio_part.entity";
 
 @Module({
   imports: [
+    TelegrafModule.forRootAsync({
+      botName: BOT_NAME,
+      useFactory: () => ({
+        token: process.env.BOT_TOKEN!,
+        middlewares: [],
+        include: [BotModule], //bot
+      }),
+    }),
+
     ConfigModule.forRoot({
       envFilePath: ".env",
       isGlobal: true,
@@ -35,7 +55,18 @@ import { Language } from "./language/entities/language.entity";
       username: process.env.PG_USER,
       password: process.env.PG_PASSWORD,
       database: process.env.PG_DB,
-      models: [User, Admin, Author, Category, Genre, Language],
+      models: [
+        User,
+        Admin,
+        Author,
+        Category,
+        Genre,
+        Language,
+        Book,
+        BookVersion,
+        AudioBook,
+        AudioPart,
+      ],
       autoLoadModels: true,
       logging: true,
       sync: { alter: true }, //alter force sync
@@ -48,6 +79,11 @@ import { Language } from "./language/entities/language.entity";
     AuthorModule,
     LanguageModule,
     GenreModule,
+    BotModule,
+    BooksModule,
+    BookVersionModule,
+    AudioBookModule,
+    AudioPartsModule,
   ],
   controllers: [],
   providers: [],

@@ -22,11 +22,19 @@ export class AuthorService {
     return this.authorModel.findByPk(id);
   }
 
-  update(id: number, updateAuthorDto: UpdateAuthorDto) {
-    return `This action updates a #${id} author`;
+  async update(id: number, updateAuthorDto: UpdateAuthorDto) {
+    const author = await this.authorModel.update(updateAuthorDto, {
+      where: { id },
+      returning: true,
+    });
+    return author[1][0];
   }
 
-  remove(id: number) {
-    return this.authorModel.destroy({ where: { id } });
+  async remove(id: number) {
+    const result = await this.authorModel.destroy({ where: { id } });
+    if (result > 0) {
+      return { message: "author deleted successfully" };
+    }
+    return { message: "author not found" };
   }
 }

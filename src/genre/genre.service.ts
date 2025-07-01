@@ -20,11 +20,19 @@ export class GenreService {
     return this.genreModel.findByPk(id);
   }
 
-  update(id: number, updateGenreDto: UpdateGenreDto) {
-    return `This action updates a #${id} genre`;
+  async update(id: number, updateGenreDto: UpdateGenreDto) {
+    const genre = await this.genreModel.update(updateGenreDto, {
+      where: { id },
+      returning: true,
+    });
+    return genre[1][0];
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} genre`;
+  async remove(id: number) {
+    const genre = await this.genreModel.destroy({ where: { id } });
+    if (genre > 0) {
+      return { message: "genre deleted successfully" };
+    }
+    return { message: "genre not found" };
   }
 }

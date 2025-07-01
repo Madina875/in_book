@@ -3,10 +3,12 @@ import {
   AutoIncrement,
   Column,
   DataType,
+  HasMany,
   Model,
   PrimaryKey,
   Table,
 } from "sequelize-typescript";
+import { Book } from "../../books/entities/book.entity";
 
 interface IAuthorCreationAttr {
   full_name: string;
@@ -52,5 +54,8 @@ export class Author extends Model<Author, IAuthorCreationAttr> {
   @Column({
     type: DataType.STRING,
   })
-  declare image_url: string;
+  declare photo_url: string;
+
+  @HasMany(() => Book)
+  declare book: Book[];
 }

@@ -34,11 +34,20 @@ export class AdminService {
     return this.adminModel.findOne({ where: { email } });
   }
 
-  update(id: number, updateAdminDto: UpdateAdminDto) {
-    return `This action updates a #${id} admin`;
+  async update(id: number, updateAdminDto: UpdateAdminDto) {
+    const admin = await this.adminModel.update(updateAdminDto, {
+      where: { id },
+      returning: true,
+    });
+
+    return admin[1][0];
   }
 
-  remove(id: number) {
-    return this.adminModel.destroy({ where: { id } });
+  async remove(id: number) {
+    const result = await this.adminModel.destroy({ where: { id } });
+    if (result > 0) {
+      return { message: "admin delete successfully" };
+    }
+    return { message: " admin not found" };
   }
 }

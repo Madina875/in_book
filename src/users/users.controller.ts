@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  HttpCode,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
@@ -15,6 +16,7 @@ import { JwtUserAuthGuard } from "../common/guards/user.guard";
 import { JwtUserSelfGuard } from "../common/guards/jwt-self.guard";
 import { JwtUserPremiumGuard } from "../common/guards/jwt-premium.guard";
 import { JwtAdminAuthGuard } from "../common/guards/admin.guard";
+import { PhoneUserDto } from "./dto/phone-user.dto";
 
 @Controller("users")
 export class UsersController {
@@ -53,5 +55,11 @@ export class UsersController {
   @Delete(":id")
   remove(@Param("id") id: string) {
     return this.usersService.remove(+id);
+  }
+
+  @HttpCode(200)
+  @Post("new-otp")
+  newOtp(@Body() phoneUserDto: PhoneUserDto) {
+    return this.usersService.newOtp(phoneUserDto);
   }
 }

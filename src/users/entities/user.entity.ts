@@ -1,6 +1,16 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { ENUM } from "sequelize";
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import {
+  BelongsToMany,
+  Column,
+  DataType,
+  HasMany,
+  Model,
+  Table,
+} from "sequelize-typescript";
+import { Book } from "../../books/entities/book.entity";
+import { BookMark } from "../../book_marks/entities/book_mark.entity";
+import { Subscription } from "../../subscription/entities/subscription.entity";
 
 interface IUsersCreationAttr {
   full_name: string;
@@ -108,4 +118,10 @@ export class User extends Model<User, IUsersCreationAttr> {
     type: DataType.STRING,
   })
   declare phone: string;
+
+  @BelongsToMany(() => Book, () => BookMark)
+  book: Book[];
+
+  @HasMany(() => Subscription)
+  declare subscription: Subscription[];
 }

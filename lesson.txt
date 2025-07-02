@@ -14,3 +14,14 @@ bot.module:  //4
 })
 export class BotModule {}
 
+
+
+
+//
+
+npm i dotenv
+npm i otp-generator
+npm i --save-dev @types/otp-generator
+
+
+nest g mo otp

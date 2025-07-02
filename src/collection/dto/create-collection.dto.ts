@@ -17,7 +17,6 @@ export class CreateCollectionDto {
   @IsBoolean()
   @ApiProperty({ example: false, description: "size mb" })
   is_public: boolean;
-  @IsNumber()
   @ApiProperty({ example: false, description: "order index" })
   is_premiumOnly: boolean;
   @ApiProperty({ example: false, description: "order index" })

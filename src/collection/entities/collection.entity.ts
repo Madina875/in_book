@@ -15,8 +15,8 @@ interface ICollectionCreationAttr {
   coverImageUrl: string;
   createdBy: number;
   is_public: boolean;
-  // is_premiumOnly: boolean;
-  // is_premium: boolean;
+  is_premiumOnly: boolean;
+  is_premium: boolean;
 }
 
 @Table({ tableName: "collection" })

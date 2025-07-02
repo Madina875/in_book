@@ -4,7 +4,7 @@ import { IsNumber } from "class-validator";
 export class CreateBookCollectionDto {
   @IsNumber()
   @ApiProperty({ example: 1, description: "id" })
-  collectionId: string;
+  collectionId: number;
   @IsNumber()
   @ApiProperty({ example: 1, description: "id" })
   bookId: number;

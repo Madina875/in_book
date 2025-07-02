@@ -1,15 +1,21 @@
-import { Injectable } from '@nestjs/common';
-import { CreateBookCollectionDto } from './dto/create-book_collection.dto';
-import { UpdateBookCollectionDto } from './dto/update-book_collection.dto';
+import { Injectable } from "@nestjs/common";
+import { CreateBookCollectionDto } from "./dto/create-book_collection.dto";
+import { UpdateBookCollectionDto } from "./dto/update-book_collection.dto";
+import { InjectModel } from "@nestjs/sequelize";
+import { BookCollection } from "./entities/book_collection.entity";
 
 @Injectable()
 export class BookCollectionService {
+  constructor(
+    @InjectModel(BookCollection)
+    private readonly bookCollectionModdel: typeof BookCollection
+  ) {}
   create(createBookCollectionDto: CreateBookCollectionDto) {
-    return 'This action adds a new bookCollection';
+    return this.bookCollectionModdel.create(createBookCollectionDto);
   }
 
   findAll() {
-    return `This action returns all bookCollection`;
+    return this.bookCollectionModdel.findAll();
   }
 
   findOne(id: number) {
